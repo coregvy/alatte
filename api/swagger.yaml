@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   description: "."
   version: "1.0.0"
-  title: "Swagger Petstore"
+  title: "alatte api server"
   termsOfService: "http://swagger.io/terms/"
   contact:
     email: "apiteam@swagger.io"
@@ -11,24 +11,21 @@ info:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
 host: "localhost:8080"
-basePath: "/v2"
+basePath: "/api"
 tags:
 - name: "user"
-  description: "洗濯物依頼者用"
-  externalDocs:
-    description: "Find out more"
-    url: "http://swagger.io"
+  description: ""
 - name: "career"
-  description: "運搬者用"
+  description: ""
 schemes:
 - "http"
 paths:
-  /api/user/login:
+  /user/login:
     get:
       tags:
       - "user"
       summary: "login"
-      description: "ログイン"
+      description: "user login"
       operationId: "login"
       produces:
       - "application/json"
@@ -43,13 +40,13 @@ paths:
           description: "successful operation"
         400:
           description: "Invalid status value"
-      x-swagger-router-controller: "Login"
-  /api/user/task:
+      x-swagger-router-controller: "User"
+  /user/task:
     put:
       tags:
       - "user"
       summary: "add task"
-      description: "洗濯物登録"
+      description: ""
       operationId: "addTask"
       produces:
       - "application/json"
@@ -66,12 +63,12 @@ paths:
         404:
           description: "User not found"
       x-swagger-router-controller: "Task"
-  /api/task/{taskId}:
+  /task/{taskId}:
     get:
       tags:
       - "user"
       summary: "Find task by ID"
-      description: "タスク状態検索"
+      description: ""
       operationId: "getTaskStatus"
       produces:
       - "application/json"
@@ -87,22 +84,20 @@ paths:
           description: "successful operation"
         400:
           description: "Invalid ID supplied"
-        404:
-          description: "Pet not found"
       x-swagger-router-controller: "Task"
-  /api/career/login:
+  /career/login:
     get:
       tags:
       - "career"
       summary: "login"
-      description: "ログイン"
+      description: "career login"
       operationId: "careerLogin"
       produces:
       - "application/json"
       parameters:
       - name: "name"
         in: "query"
-        description: ""
+        description: "carrer user name"
         required: true
         type: "string"
       responses:
@@ -110,13 +105,13 @@ paths:
           description: "successful operation"
         400:
           description: "Invalid status value"
-      x-swagger-router-controller: "Login"
-  /api/career/task:
+      x-swagger-router-controller: "Career"
+  /career/task:
     get:
       tags:
       - "career"
       summary: "search task"
-      description: "運搬依頼検索"
+      description: ""
       operationId: "taskSearch"
       produces:
       - "application/json"
@@ -128,12 +123,12 @@ paths:
         type: "string"
       - name: "latitude"
         in: "query"
-        description: "緯度"
+        description: ""
         required: true
         type: "number"
       - name: "longitude"
         in: "query"
-        description: "経度"
+        description: ""
         required: true
         type: "number"
       responses:
@@ -142,12 +137,12 @@ paths:
         400:
           description: "Invalid status value"
       x-swagger-router-controller: "Career"
-  /api/career/declare:
+  /career/declare:
     post:
       tags:
       - "career"
       summary: "declare task"
-      description: "タスク実行を宣言する"
+      description: ""
       operationId: "declareTask"
       produces:
       - "application/json"
@@ -164,12 +159,12 @@ paths:
         404:
           description: "User not found"
       x-swagger-router-controller: "Career"
-  /api/career/location:
+  /career/location:
     post:
       tags:
       - "career"
       summary: "regist location"
-      description: "位置登録"
+      description: ""
       operationId: "registerLocation"
       produces:
       - "application/json"
@@ -186,12 +181,12 @@ paths:
         404:
           description: "User not found"
       x-swagger-router-controller: "Career"
-  /api/career/receipt/{taskId}:
+  /career/receipt/{taskId}:
     post:
       tags:
       - "career"
       summary: "receipt"
-      description: "荷物受領"
+      description: ""
       operationId: "receipt"
       produces:
       - "application/json"
@@ -208,12 +203,12 @@ paths:
         404:
           description: "User not found"
       x-swagger-router-controller: "Career"
-  /api/career/start/{taskId}:
+  /career/start/{taskId}:
     post:
       tags:
       - "career"
       summary: "start"
-      description: "洗濯スタート"
+      description: ""
       operationId: "start"
       produces:
       - "application/json"
@@ -230,12 +225,12 @@ paths:
         404:
           description: "User not found"
       x-swagger-router-controller: "Career"
-  /api/career/checkout/{taskId}:
+  /career/checkout/{taskId}:
     post:
       tags:
       - "career"
       summary: "checkout"
-      description: "洗濯回収"
+      description: ""
       operationId: "checkout"
       produces:
       - "application/json"
@@ -252,12 +247,12 @@ paths:
         404:
           description: "User not found"
       x-swagger-router-controller: "Career"
-  /api/career/end/{taskId}:
+  /career/end/{taskId}:
     post:
       tags:
       - "career"
       summary: "end task"
-      description: "洗濯物引き渡し"
+      description: ""
       operationId: "end"
       produces:
       - "application/json"

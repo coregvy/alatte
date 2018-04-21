@@ -3,21 +3,22 @@
 
 /**
  * login
- * ログイン
+ * 
  *
  * name String 
  * no response value expected for this operation
  **/
 exports.careerLogin = function(name) {
   return new Promise(function(resolve, reject) {
-    resolve();
+    console.log('career login:', name);
+    resolve({careerId: 100});
   });
 }
 
 
 /**
  * checkout
- * 洗濯回収
+ * 
  *
  * taskId Long task id
  * no response value expected for this operation
@@ -31,7 +32,7 @@ exports.checkout = function(taskId) {
 
 /**
  * declare task
- * タスク実行を宣言する
+ * 
  *
  * body Declare Updated user object
  * no response value expected for this operation
@@ -45,7 +46,7 @@ exports.declareTask = function(body) {
 
 /**
  * end task
- * 洗濯物引き渡し
+ * 
  *
  * taskId Long task id
  * no response value expected for this operation
@@ -59,7 +60,7 @@ exports.end = function(taskId) {
 
 /**
  * receipt
- * 荷物受領
+ * 
  *
  * taskId Long task id
  * no response value expected for this operation
@@ -73,7 +74,7 @@ exports.receipt = function(taskId) {
 
 /**
  * regist location
- * 位置登録
+ * 
  *
  * body Location Updated user object
  * no response value expected for this operation
@@ -87,7 +88,7 @@ exports.registerLocation = function(body) {
 
 /**
  * start
- * 洗濯スタート
+ * 
  *
  * taskId Long task id
  * no response value expected for this operation
@@ -101,11 +102,11 @@ exports.start = function(taskId) {
 
 /**
  * search task
- * 運搬依頼検索
+ * 
  *
  * careerId String 
- * latitude BigDecimal 緯度
- * longitude BigDecimal 経度
+ * latitude BigDecimal 
+ * longitude BigDecimal 
  * no response value expected for this operation
  **/
 exports.taskSearch = function(careerId,latitude,longitude) {
