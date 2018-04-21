@@ -1,14 +1,16 @@
 {
-  "name": "apiserver",
+  "name": "alatte",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "alatte",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js"
   },
-  "author": "",
+  "author": "YMIYA",
   "license": "ISC",
-  "devDependencies": {
-    "node-red": "^0.18.4"
-  }
+  "dependencies": {
+    "body-parser": "^1.18.1",
+    "express": "*",
+  },
+  "devDependencies": {}
 }
