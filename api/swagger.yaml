@@ -13,22 +13,22 @@ info:
 host: "localhost:8080"
 basePath: "/v2"
 tags:
-- name: "login"
-  description: "alatte"
+- name: "user"
+  description: "洗濯物依頼者用"
   externalDocs:
     description: "Find out more"
     url: "http://swagger.io"
-- name: "task"
-  description: ""
+- name: "career"
+  description: "運搬者用"
 schemes:
 - "http"
 paths:
   /api/user/login:
     get:
       tags:
-      - "login"
-      summary: ""
-      description: ""
+      - "user"
+      summary: "login"
+      description: "ログイン"
       operationId: "login"
       produces:
       - "application/json"
@@ -44,12 +44,12 @@ paths:
         400:
           description: "Invalid status value"
       x-swagger-router-controller: "Login"
-  /api/task:
+  /api/user/task:
     put:
       tags:
-      - "task"
+      - "user"
       summary: "add task"
-      description: ""
+      description: "洗濯物登録"
       operationId: "addTask"
       produces:
       - "application/json"
@@ -59,7 +59,7 @@ paths:
         description: "Updated user object"
         required: true
         schema:
-          $ref: "#/definitions/body"
+          $ref: "#/definitions/task"
       responses:
         400:
           description: "Invalid user supplied"
@@ -69,16 +69,16 @@ paths:
   /api/task/{taskId}:
     get:
       tags:
-      - "task"
-      summary: "Find pet by ID"
-      description: "Returns a single pet"
-      operationId: "getPetById"
+      - "user"
+      summary: "Find task by ID"
+      description: "タスク状態検索"
+      operationId: "getTaskStatus"
       produces:
       - "application/json"
       parameters:
       - name: "taskId"
         in: "path"
-        description: "ID of pet to return"
+        description: "task id"
         required: true
         type: "integer"
         format: "int64"
@@ -90,8 +90,192 @@ paths:
         404:
           description: "Pet not found"
       x-swagger-router-controller: "Task"
+  /api/career/login:
+    get:
+      tags:
+      - "career"
+      summary: "login"
+      description: "ログイン"
+      operationId: "careerLogin"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "query"
+        description: ""
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Invalid status value"
+      x-swagger-router-controller: "Login"
+  /api/career/task:
+    get:
+      tags:
+      - "career"
+      summary: "search task"
+      description: "運搬依頼検索"
+      operationId: "taskSearch"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "careerId"
+        in: "query"
+        description: ""
+        required: true
+        type: "string"
+      - name: "latitude"
+        in: "query"
+        description: "緯度"
+        required: true
+        type: "number"
+      - name: "longitude"
+        in: "query"
+        description: "経度"
+        required: true
+        type: "number"
+      responses:
+        200:
+          description: "successful operation"
+        400:
+          description: "Invalid status value"
+      x-swagger-router-controller: "Career"
+  /api/career/declare:
+    post:
+      tags:
+      - "career"
+      summary: "declare task"
+      description: "タスク実行を宣言する"
+      operationId: "declareTask"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/declare"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+      x-swagger-router-controller: "Career"
+  /api/career/location:
+    post:
+      tags:
+      - "career"
+      summary: "regist location"
+      description: "位置登録"
+      operationId: "registerLocation"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/location"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+      x-swagger-router-controller: "Career"
+  /api/career/receipt/{taskId}:
+    post:
+      tags:
+      - "career"
+      summary: "receipt"
+      description: "荷物受領"
+      operationId: "receipt"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "task id"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+      x-swagger-router-controller: "Career"
+  /api/career/start/{taskId}:
+    post:
+      tags:
+      - "career"
+      summary: "start"
+      description: "洗濯スタート"
+      operationId: "start"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "task id"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+      x-swagger-router-controller: "Career"
+  /api/career/checkout/{taskId}:
+    post:
+      tags:
+      - "career"
+      summary: "checkout"
+      description: "洗濯回収"
+      operationId: "checkout"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "task id"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+      x-swagger-router-controller: "Career"
+  /api/career/end/{taskId}:
+    post:
+      tags:
+      - "career"
+      summary: "end task"
+      description: "洗濯物引き渡し"
+      operationId: "end"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "taskId"
+        in: "path"
+        description: "task id"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+      x-swagger-router-controller: "Career"
 definitions:
-  body:
+  task:
     type: "object"
     properties:
       userId:
@@ -102,13 +286,27 @@ definitions:
       objects:
         type: "array"
         items:
-          $ref: "#/definitions/apitask_objects"
-  apitask_objects:
+          $ref: "#/definitions/taskitem"
+  taskitem:
     properties:
       kind:
         type: "string"
       count:
         type: "integer"
+  declare:
+    type: "object"
+    properties:
+      careerId:
+        type: "integer"
+      taskId:
+        type: "integer"
+  location:
+    type: "object"
+    properties:
+      latitude:
+        type: "number"
+      longitude:
+        type: "number"
 externalDocs:
   description: "Find out more about Swagger"
   url: "http://swagger.io"
