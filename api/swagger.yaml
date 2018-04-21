@@ -10,16 +10,16 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "petstore.swagger.io"
+host: "localhost:8080"
 basePath: "/v2"
 tags:
 - name: "login"
-  description: "Everything about your Pets"
+  description: "alatte"
   externalDocs:
     description: "Find out more"
     url: "http://swagger.io"
 - name: "task"
-  description: "Access to Petstore orders"
+  description: ""
 schemes:
 - "http"
 paths:
