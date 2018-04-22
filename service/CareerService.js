@@ -12,6 +12,7 @@ const config = {
         , encrypt: true
     }
 };
+const DEFINITION = require('../utils/definition');
 
 /**
  * login
@@ -107,6 +108,7 @@ exports.registerLocation = function(body) {
  **/
 exports.start = function(taskId) {
   return new Promise(function(resolve, reject) {
+    execSql('update task set status = ' + DEFINITION.STATUS.DERIVERY_HOST_DECIDED + ' where id = ' + taskId, resolve);
     resolve();
   });
 }
@@ -123,37 +125,35 @@ exports.start = function(taskId) {
  **/
 exports.taskSearch = function(careerId,latitude,longitude) {
   return new Promise(function (resolve, reject) {
-    const connection = new Connection(config);
-    connection.on('connect', function (err) {
-      if (err) {
-        console.log(err)
-      } else {
-        const results = [];
-        console.log('connect ok.');
-        let request = new Request(
-          "SELECT * FROM Task",
-          function (err, rowCount, rows) {
-            console.log('rows: ', rows);
-            rows.forEach((row) => {
-              console.log('row:', row);
-              result.push(row);
-            });
-            console.log(rowCount + ' row(s) returned');
-            resolve(results);
-          }
-        );
-        request.on('row', function (columns) {
-          // console.log('row fetch', columns);
-          const row = {};
-          columns.forEach(function (column) {
-            row[column.metadata.colName] = column.value;
-            console.log("column: %s\t%s", column.metadata.colName, column.value);
+    execSql("SELECT * FROM Task", resolve);
+  });
+}
+
+
+function execSql(sql, resolve) {
+  const connection = new Connection(config);
+  connection.on('connect', function (err) {
+    if (err) {
+      console.log(err)
+    } else {
+      const results = [];
+      let request = new Request(sql, function (err, rowCount, rows) {
+          rows.forEach((row) => {
+            result.push(row);
           });
-          results.push(row);
+          console.log(rowCount + ' row(s) returned');
+          resolve(results);
+        }
+      );
+      request.on('row', function (columns) {
+        const row = {};
+        columns.forEach(function (column) {
+          row[column.metadata.colName] = column.value;
         });
-        connection.execSql(request);
-      }
-    });
+        results.push(row);
+      });
+      connection.execSql(request);
+    }
   });
 }
 
