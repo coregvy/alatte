@@ -1,12 +1,12 @@
 
 exports.STATUS = {
-  REGISTERD: 0,
-  DERIVERY_HOST_DECIDED: 1,
-  DERIVERY_HOST_COLLECTED: 2,
-  WASH_START: 3,
-  WASH_END: 4,
-  RECEIVE_HOST_COLLECTED: 5,
-  RECEIVE_HOST_DERIVERED: 6
+  REGISTERD: 0,   /// ユーザが洗濯物登録完了
+  DERIVERY_HOST_DECIDED: 1, /// ホストのやります宣言
+  DERIVERY_HOST_COLLECTED: 2, /// ホストの荷物回収完了
+  WASH_START: 3,  /// 洗濯開始
+  RECEIVE_HOST_DECIDED: 4,  /// 回収担当者の宣言
+  RECEIVE_HOST_COLLECTED: 5,  /// 洗濯済み荷物回収
+  RECEIVE_HOST_DERIVERED: 6   /// 返却完了
 };
 
 exports.AQUA_API = {
