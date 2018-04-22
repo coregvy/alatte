@@ -30,14 +30,52 @@ exports.addTask = function(body,taskId) {
         console.log("db alatte connected!");
         console.log("body", body);
         // body
-        var planA = body.plan;
-        var typeA = body.type;
-        var countA = body.count;
-        var deliveryA = body.delivery;
+        var priceA = 500; // body.price;
+        var userIdA = 5 // body.userId;
+        console.log("taskId", taskId);
+
         // get max id request
         var request = new Request(
-        "INSERT INTO TestTask(Id,UserId,DeriveryTime,Status) VALUES("
-        + taskId + ", '0000000A','2018-04-22 00:00:00','0')",
+        "INSERT INTO Task(Id, UserId, UserPrice, Status) VALUES("
+        + taskId + "," + userIdA + "," + priceA + ",0)",
+        function(err, rowCount, rows) {
+          if ( err ) {
+            console.log("err", err);
+          } else {
+            console.log("rowCount", rowCount);
+            console.log("row", rows);
+          }
+        });
+        //hook
+        request.on('row', function(columns) {
+          columns.forEach(function (column) {
+            console.log("column: %s\t%s", column.metadata.colName, column.value);
+          });
+          resolve();
+        });
+        connection.execSql(request);
+      }
+    });
+  });
+}
+
+exports.addLuggage = function(body, taskId) {
+  return new Promise(function(resolve, reject) {
+    var connection = new Connection(config);
+    connection.on('connect', function(err) {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log("db alatte connected!");
+        console.log("body", body);
+        // body
+        var typeA = 1;//body.type;
+        var userIdA = 5; // body.userId;
+
+        // get max id request
+        var request = new Request(
+        "INSERT INTO Luggage(Id, Type, TaskId, UserId) VALUES((select max(Id)+1 from Luggage),"
+        + typeA + "," + taskId + "," + userIdA + ")",
         function(err, rowCount, rows) {
           if ( err ) {
             console.log("err", err);
@@ -72,7 +110,7 @@ exports.RenewTaskId = function() {
         "select max(Id) from TestTask",
         function(err, rowCount, rows) {
           if ( err ) {
-            console.log("err", err);
+            console.log("erraaaa", err);
           } else {
             console.log("rowCount", rowCount);
             console.log("row", rows);
