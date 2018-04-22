@@ -18,6 +18,9 @@
     "swagger-tools": "0.10.1"
   },
   "devDependencies": {
-    "tedious": "^2.3.1"
+    "request": "^2.85.0",
+    "sync-request": "^6.0.0",
+    "tedious": "^2.3.1",
+    "then-request": "^6.0.0"
   }
 }

@@ -2,6 +2,7 @@
 
 const Connection = require('tedious').Connection;
 const Request = require('tedious').Request;
+const request = require('sync-request');
 const config = {
   userName: 'alatte',
   password: 'p@ssw0rd',
@@ -12,7 +13,7 @@ const config = {
         , encrypt: true
     }
 };
-const DEFINITION = require('../utils/definition');
+const DEF = require('../utils/definition');
 
 /**
  * login
@@ -24,7 +25,7 @@ const DEFINITION = require('../utils/definition');
 exports.careerLogin = function(name) {
   return new Promise(function(resolve, reject) {
     console.log('career login:', name);
-    resolve({careerId: 100});
+    execSql('select id from HostInfo where name = \'' + name + '\'', resolve);
   });
 }
 
@@ -108,7 +109,7 @@ exports.registerLocation = function(body) {
  **/
 exports.start = function(taskId) {
   return new Promise(function(resolve, reject) {
-    execSql('update task set status = ' + DEFINITION.STATUS.DERIVERY_HOST_DECIDED + ' where id = ' + taskId, resolve);
+    execSql('update task set status = ' + DEF.STATUS.DERIVERY_HOST_DECIDED + ' where id = ' + taskId, resolve);
     resolve();
   });
 }
@@ -125,12 +126,53 @@ exports.start = function(taskId) {
  **/
 exports.taskSearch = function(careerId,latitude,longitude) {
   return new Promise(function (resolve, reject) {
-    execSql("SELECT * FROM Task", resolve);
+    execSql('select t.Id as taskId, t.Status as status, t.OwnerId as ownerId, t.ShopId as shopId, u.latitude as userLatitude, u.longitude as userLongitude  from task as t join userinfo as u on t.UserId = u.Id where status in ('+DEF.STATUS.REGISTERD+','+DEF.STATUS.WASH_END+')', (res)=> {
+      console.log('sql result:', res);
+      res.forEach((task) => {
+        if (task.status == DEF.STATUS.REGISTERD) {
+          // 持ち込み前
+          task.from = {
+            latitude: task.userLatitude,
+            longitude: task.userLongitude
+          }
+          const res = request('GET', DEF.AQUA_API.BASE_URL + 'shopinfo?ANKLONGITUDE=' + task.from.longitude + '&ANKPARALLEL=' + task.from.latitude, {
+            headers: {
+              Authorization:'Bearer ' + DEF.AQUA_API.TOKEN,
+              Accept:'application/json'
+            }
+          });
+
+          const resobj = JSON.parse(res.getBody('utf-8'));
+          console.log('resobj:: ', resobj);
+          task.to = {
+            latitude: resobj.DataModel[0].ANKPARALLEL,
+            longitude: resobj.DataModel[0].ANKLONGITUDE
+          }
+          console.log('api end.');
+        } else {
+          request.get({
+            url: DEF.AQUA_API.BASE_URL + 'api/shopinfo?ANKOWNERID=' + task.ownerId + '&ANKSHOPID=' + task.shopId,
+            headers: {
+              Authorization:'Bearer ' + DEF.AQUA_API.TOKEN,
+              Accept:'application/json'
+            }
+          }, (error, res, body) => {
+            console.log('api2: ', body);
+          });
+          task.from = {
+            latitude: 0,
+            longitude: 0
+          };
+        }
+      });
+      resolve(res);
+    });
   });
 }
 
 
-function execSql(sql, resolve) {
+function execSql(sql, callback) {
+  console.log('sql: ', sql);
   const connection = new Connection(config);
   connection.on('connect', function (err) {
     if (err) {
@@ -142,7 +184,7 @@ function execSql(sql, resolve) {
             result.push(row);
           });
           console.log(rowCount + ' row(s) returned');
-          resolve(results);
+          callback(results);
         }
       );
       request.on('row', function (columns) {
