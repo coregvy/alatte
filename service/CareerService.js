@@ -59,7 +59,7 @@ exports.checkout = function(taskId) {
  **/
 exports.declareTask = function(body) {
   return new Promise(function(resolve, reject) {
-    execSql('select * from task where id = '+body.taskId, (rows)=> {
+    execSql('select * from task as t join UserInfo as u on t.userId = u.Id where t.id = '+body.taskId, (rows)=> {
       if(rows.length === 0) {
         reject({msg:'task not found.'});
         return;
@@ -68,11 +68,22 @@ exports.declareTask = function(body) {
         reject({msg:'task status failed: ' + rows[0].Status});
         return;
       }
+      const task = rows[0];
+      console.log('+++ task: ', task);
       const isDerivery = rows[0].Status==DEF.STATUS.REGISTERD
       const updateState = isDerivery ? DEF.STATUS.DERIVERY_HOST_DECIDED : RECEIVE_HOST_DECIDED;
       let sql = 'update task set status = ' + updateState + ', deriveryHostId = '+ body.careerId;
       // todo
       if (isDerivery) {
+        const res = syncRequest('GET', DEF.AQUA_API.BASE_URL + 'shopinfo?ANKLONGITUDE=' + task.longitude + '&ANKPARALLEL=' + task.latitude, {
+          headers: {
+            Authorization:'Bearer ' + DEF.AQUA_API.TOKEN,
+            Accept:'application/json'
+          }
+        });
+        const resobj = JSON.parse(res.getBody('utf-8'));
+        console.log('+++ res: ', resobj);
+        sql = sql + ', shopId = '+resobj.DataModel[0].ANKSHOPID + ', OwnerId='+resobj.DataModel[0].ANKOWNERID;
         sql = sql + ', deriveryPrice = ' + 100;
       } else {
         sql = sql + ', ReceivePrice = ' + 150;
@@ -151,7 +162,7 @@ exports.registerLocation = function(body) {
  **/
 exports.start = function(taskId) {
   return new Promise(function(resolve, reject) {
-    execSql('update task set status = ' + DEF.STATUS.DERIVERY_HOST_DECIDED + ' where id = ' + taskId, ()=>{
+    execSql('update task set status = ' + DEF.STATUS.WASH_START + ' where id = ' + taskId, ()=>{
       execSql('insert into taskhistory (id, taskId, status, taskTime) select max(id)+1, ' + taskId + ', ' + DEF.STATUS.DERIVERY_HOST_DECIDED + ', current_timestamp from taskhistory ', () => {
         resolve();
       });
@@ -202,6 +213,7 @@ exports.taskSearch = function(careerId,latitude,longitude) {
             longitude: task.userLongitude
           }
           // 店舗IDから座標取得
+          console.log('task: ', task);
           const res = syncRequest('GET', DEF.AQUA_API.BASE_URL + 'shopinfo?ANKOWNERID=' + task.ownerId + '&ANKSHOPID=' + task.shopId, {
             headers: {
               Authorization:'Bearer ' + DEF.AQUA_API.TOKEN,
@@ -209,6 +221,7 @@ exports.taskSearch = function(careerId,latitude,longitude) {
             }
           });
           const resobj = JSON.parse(res.getBody('utf-8'));
+          console.log('api res: ', resobj);
           task.from = {
             latitude: resobj.DataModel[0].ANKPARALLEL,
             longitude: resobj.DataModel[0].ANKLONGITUDE

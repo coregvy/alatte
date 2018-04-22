@@ -31,7 +31,7 @@ exports.addTask = function(body,taskId) {
         console.log("body", body);
         // body
         var priceA = 500; // body.price;
-        var userIdA = 5 // body.userId;
+        var userIdA = body.userId;
         console.log("taskId", taskId);
 
         // get max id request
