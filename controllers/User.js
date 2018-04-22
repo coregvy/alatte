@@ -5,8 +5,14 @@ var User = require('../service/UserService');
 
 module.exports.addTask = function addTask (req, res, next) {
   var body = req.swagger.params['body'].value;
-  User.addTask(body)
+  var id;
+  User.RenewTaskId(body)
     .then(function (response) {
+      id = response;
+      User.addTask(body, id)
+    })
+    .then(function (response) {
+      utils.writeJson(res, {"taskId":id});
       utils.writeJson(res, response);
     })
     .catch(function (response) {
