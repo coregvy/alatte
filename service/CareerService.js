@@ -25,7 +25,9 @@ const DEF = require('../utils/definition');
 exports.careerLogin = function(name) {
   return new Promise(function(resolve, reject) {
     console.log('career login:', name);
-    execSql('select id from HostInfo where name = \'' + name + '\'', resolve);
+    execSql('select id as careerId from HostInfo where name = \'' + name + '\'', (rows) => {
+      resolve(rows[0]);
+    });
   });
 }
 
@@ -57,9 +59,29 @@ exports.checkout = function(taskId) {
  **/
 exports.declareTask = function(body) {
   return new Promise(function(resolve, reject) {
-    execSql('update task set status = ' + DEF.STATUS.DERIVERY_HOST_DECIDED + ', deriveryHostId = '+ body.careerId + ' where id = ' + taskId, () => {
-      execSql('insert into taskhistory (id, taskId, status, taskTime) select max(id)+1, ' + taskId + ', ' + DEF.STATUS.DERIVERY_HOST_DECIDED + ', current_timestamp from taskhistory ', () => {
-        resolve();
+    execSql('select * from task where id = '+body.taskId, (rows)=> {
+      if(rows.length === 0) {
+        reject({msg:'task not found.'});
+        return;
+      }
+      if (rows[0].Status != DEF.STATUS.REGISTERD && rows[0].Status != DEF.STATUS.WASH_START) {
+        reject({msg:'task status failed: ' + rows[0].Status});
+        return;
+      }
+      const isDerivery = rows[0].Status==DEF.STATUS.REGISTERD
+      const updateState = isDerivery ? DEF.STATUS.DERIVERY_HOST_DECIDED : RECEIVE_HOST_DECIDED;
+      let sql = 'update task set status = ' + updateState + ', deriveryHostId = '+ body.careerId;
+      // todo
+      if (isDerivery) {
+        sql = sql + ', deriveryPrice = ' + 100;
+      } else {
+        sql = sql + ', ReceivePrice = ' + 150;
+      }
+      sql = sql + ' where id = ' + body.taskId;
+      execSql(sql, () => {
+        execSql('insert into taskhistory (id, taskId, status, taskTime) select max(id)+1, ' + body.taskId + ', ' + updateState + ', current_timestamp from taskhistory ', () => {
+          resolve();
+        });
       });
     });
   });
