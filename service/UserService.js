@@ -107,10 +107,10 @@ exports.RenewTaskId = function() {
         console.log("db alatte connected!");
 
         var request = new Request(
-        "select max(Id) from TestTask",
+        "select max(Id) from Task",
         function(err, rowCount, rows) {
           if ( err ) {
-            console.log("erraaaa", err);
+            console.log("err", err);
           } else {
             console.log("rowCount", rowCount);
             console.log("row", rows);
@@ -144,7 +144,7 @@ exports.getTaskStatus = function(taskId) {
       } else {
         console.log("db alatte connected!");
         var request = new Request(
-        "select Status from TestTask where Id=" + taskId,
+        "select Status from Task where Id=" + taskId,
         function(err, rowCount, rows) {
           if ( err ) {
             console.log("err", err);

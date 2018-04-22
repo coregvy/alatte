@@ -15,7 +15,7 @@ module.exports.addTask = function addTask (req, res, next) {
       User.addLuggage(body, id)
     })
     .then(function (response) {
-      utils.writeJson(res, {"taskId":id});
+      utils.writeJson(res, {"taskId":id, "price":500});
     })
     .catch(function (response) {
       utils.writeJson(res, response);
