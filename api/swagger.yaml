@@ -62,7 +62,7 @@ paths:
           description: "Invalid user supplied"
         404:
           description: "User not found"
-      x-swagger-router-controller: "Task"
+      x-swagger-router-controller: "User"
   /task/{taskId}:
     get:
       tags:
@@ -84,7 +84,7 @@ paths:
           description: "successful operation"
         400:
           description: "Invalid ID supplied"
-      x-swagger-router-controller: "Task"
+      x-swagger-router-controller: "User"
   /career/login:
     get:
       tags:
