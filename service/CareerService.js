@@ -1,5 +1,17 @@
 'use strict';
 
+const Connection = require('tedious').Connection;
+const Request = require('tedious').Request;
+const config = {
+  userName: 'alatte',
+  password: 'p@ssw0rd',
+  server: 'alatte.database.windows.net',
+  options: 
+    {
+        database: 'alatte'
+        , encrypt: true
+    }
+};
 
 /**
  * login
@@ -110,8 +122,38 @@ exports.start = function(taskId) {
  * no response value expected for this operation
  **/
 exports.taskSearch = function(careerId,latitude,longitude) {
-  return new Promise(function(resolve, reject) {
-    resolve();
+  return new Promise(function (resolve, reject) {
+    const connection = new Connection(config);
+    connection.on('connect', function (err) {
+      if (err) {
+        console.log(err)
+      } else {
+        const results = [];
+        console.log('connect ok.');
+        let request = new Request(
+          "SELECT * FROM Task",
+          function (err, rowCount, rows) {
+            console.log('rows: ', rows);
+            rows.forEach((row) => {
+              console.log('row:', row);
+              result.push(row);
+            });
+            console.log(rowCount + ' row(s) returned');
+            resolve(results);
+          }
+        );
+        request.on('row', function (columns) {
+          // console.log('row fetch', columns);
+          const row = {};
+          columns.forEach(function (column) {
+            row[column.metadata.colName] = column.value;
+            console.log("column: %s\t%s", column.metadata.colName, column.value);
+          });
+          results.push(row);
+        });
+        connection.execSql(request);
+      }
+    });
   });
 }
 
